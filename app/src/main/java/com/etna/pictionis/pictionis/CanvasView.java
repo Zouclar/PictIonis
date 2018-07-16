@@ -71,25 +71,24 @@ public class CanvasView extends View {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 //Map<String, Object> map = (Map<String, Object>) dataSnapshot.getValue(); for map
                 Object valeurs = dataSnapshot.getValue(); // Choper les données quand elles changes coté firebase
+                ArrayList<Float> recep = (ArrayList<Float>) valeurs;
                 if (valeurs != null) {
                     //System.out.println(TblxPoints.getParent().toString());
                     //Map list = (Map) valeurs;
-                    System.out.println(valeurs);
+                    //System.out.println(valeurs);
 
                     //TODO: écrire ce qui est reçu sur le canvas
 
-                    //for (Object n : list)
-                    //    Ecriture sur le canvas
-                    //    System.out.println(n.toString());
-                    //}
+                    for (Object n : TBLPoints){
+                        //Ecriture sur le canvas
+                        System.out.println(recep);
+                    }
                 }
-
-
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                System.out.println("Cancelled");
             }
         });
     }
@@ -108,9 +107,8 @@ public class CanvasView extends View {
     // override onDraw
     @Override
     protected void onDraw(Canvas canvas) {
-        //System.out.println("OnDraw");
         super.onDraw(canvas);
-        // draw the mPath with the mPaint on the canvas when onDrawc
+        // draw the mPath with the mPaint on the canvas when onDraw
         canvas.drawPath(mPath, mPaint);
     }
 
@@ -137,6 +135,18 @@ public class CanvasView extends View {
         TBLPoints.add(mY);
         TblxPoints.setValue(TBLPoints);
     }
+
+    private void moveTouchLocal(float x, float y) {
+        float dx = Math.abs(x - mX);
+        float dy = Math.abs(y - mY);
+        if (dx >= TOLERANCE || dy >= TOLERANCE) {
+            mPath.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
+            mX = x;
+            mY = y;
+        }
+    }
+
+
 
     public void clearCanvas() {
         //System.out.println("CLEAR CANEVAS");
