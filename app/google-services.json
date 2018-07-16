@@ -1,0 +1,59 @@
+{
+  "project_info": {
+    "project_number": "106028255704",
+    "firebase_url": "https://pictionis-c67f4.firebaseio.com",
+    "project_id": "pictionis-c67f4",
+    "storage_bucket": "pictionis-c67f4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:106028255704:android:e9ab6a9b423f3590",
+        "android_client_info": {
+          "package_name": "com.etna.pictionis.pictionis"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "106028255704-pr781v5fee2tg8scp0pmhkc2h73b965j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.etna.pictionis.pictionis",
+            "certificate_hash": "25cd2fe9c2df3906e2e3423a3d2969164b4e205f"
+          }
+        },
+        {
+          "client_id": "106028255704-hjvu138d44bhtjnqqo6dnc38autr7ot6.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "106028255704-hjvu138d44bhtjnqqo6dnc38autr7ot6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDdLQR-VRPIb-sisN99iFgSMkDrVWGnZcU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "106028255704-hjvu138d44bhtjnqqo6dnc38autr7ot6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
