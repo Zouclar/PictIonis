@@ -24,3 +24,6 @@ hs_err_pid*
 
 #For security
 google-services.json
+
+.gradle/
+.idea/
