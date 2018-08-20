@@ -10,26 +10,20 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.lang.reflect.Array;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-
-import static com.etna.pictionis.pictionis.R.id.canvas;
 
 
 public class CanvasView extends View {
@@ -46,7 +40,8 @@ public class CanvasView extends View {
     DatabaseReference DBref = FirebaseDatabase.getInstance().getReference();
     DatabaseReference TblxPoints = DBref.child("Points");
     //Map<String, Float> TBLPoints = new HashMap<String, Float>();
-    ArrayList<Float> TBLPoints = new ArrayList<>();
+    Map<String, Point> TBLPoints = new HashMap<>();
+    //ArrayList<Float> TBLPoints = new ArrayList<>();
 
 
     public CanvasView(Context c, AttributeSet attrs) {
@@ -69,20 +64,66 @@ public class CanvasView extends View {
         TblxPoints.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                //Map<String, Object> map = (Map<String, Object>) dataSnapshot.getValue(); for map
-                Object valeurs = dataSnapshot.getValue(); // Choper les données quand elles changes coté firebase
-                ArrayList<Float> recep = (ArrayList<Float>) valeurs;
-                if (valeurs != null) {
+                Map<String, HashMap> map = (Map<String, HashMap>) dataSnapshot.getValue(); //for map
+                //Map valeurs = (HashMap) dataSnapshot.getValue(); // Choper les données quand elles changes coté firebase
+                //ArrayList<Float> recep = (ArrayList<Float>) valeurs;
+                if (map != null) {
                     //System.out.println(TblxPoints.getParent().toString());
-                    //Map list = (Map) valeurs;
-                    //System.out.println(valeurs);
+
+
 
                     //TODO: écrire ce qui est reçu sur le canvas
+                    System.out.println("DEBUG" + map.size());
 
-                    for (Object n : TBLPoints){
-                        //Ecriture sur le canvas
-                        System.out.println(recep);
+                    for (Map.Entry<String, HashMap> mapentry : map.entrySet()) {
+                        Point point = new Point(mapentry.getValue());
+                        float x = (float) point.X;
+                        float y = (float) point.Y;
+                        System.out.println("DEBUG" + mapentry);
+                        String type = (String) mapentry.getValue().get("type");
+
+
+//                        String type = point.type;
+                        System.out.println("TYPE : " + type);
+                        //Point point = (Point) mapentry.getValue();
+                        //HashMap point = mapentry.getValue();
+
+                        switch (type) {
+                            case "start":
+                                mPath.reset();
+                                mPath.moveTo(x,y);
+//                                startTouchLocal(x, y);
+//                                invalidate();
+                                break;
+                            case "move":
+                                  mPath.lineTo(x,y);
+//                                moveTouchLocal(x, y);
+//                                invalidate();
+                                break;
+                            case "up":
+                                upTouchLocal();
+                                invalidate();
+                                break;
+                        }
+
+                        //System.out.println("clé: "+mapentry.getKey() + " | valeur: " + mapentry.getValue());
+//                        System.out.println("point X: "+point.X);
+//                        System.out.println("point Y: "+point.Y);
+
+                        //startTouch((float)point.X,(float)point.Y);
+                        //moveTouchLocal((float)point.X,(float)point.Y);
+
+                        //HashMap point = (HashMap) mapentry.getValue();
+                        //for (Object k : point.entrySet()){
+
+                        //}
+
                     }
+
+                    //for (Object n : list){
+                        //Ecriture sur le canvas
+                      //  System.out.println(n);
+                    //}
                 }
             }
 
@@ -107,6 +148,7 @@ public class CanvasView extends View {
     // override onDraw
     @Override
     protected void onDraw(Canvas canvas) {
+        System.out.println("ON Draw");
         super.onDraw(canvas);
         // draw the mPath with the mPaint on the canvas when onDraw
         canvas.drawPath(mPath, mPaint);
@@ -114,36 +156,50 @@ public class CanvasView extends View {
 
     // when ACTION_DOWN start touch according to the x,y values
     private void startTouch(float x, float y) {
-        //System.out.println("START TOUCH");
+        System.out.println("START TOUCH");
+        //mPath.moveTo(x, y);
+
+        Point point = new Point();
+
+        point.X = (double) x;
+        point.Y = (double) y;
+        point.type = "start";
+
+        DatabaseReference newPostRef = TblxPoints.push();
+        String id = newPostRef.getKey();
+        TBLPoints.put(id,point);
+        TblxPoints.setValue(TBLPoints);
+    }
+
+    private void startTouchLocal(float x, float y) {
+        System.out.println("START TOUCH");
         mPath.moveTo(x, y);
-        mX = x;
-        mY = y;
     }
 
     // when ACTION_MOVE move touch according to the x,y values
     private void moveTouch(float x, float y) {
-        float dx = Math.abs(x - mX);
-        float dy = Math.abs(y - mY);
-        if (dx >= TOLERANCE || dy >= TOLERANCE) {
-            mPath.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
-            mX = x;
-            mY = y;
-        }
-        //TBLPoints.put("X",mX); with map
-        //TBLPoints.put("Y",mY); with map
-        TBLPoints.add(mX);
-        TBLPoints.add(mY);
+        System.out.println("Move TOUCH");
+
+//        if (dx >= TOLERANCE || dy >= TOLERANCE) {
+//            mPath.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
+//            mX = x;
+//            mY = y;
+//        }
+        Point point = new Point();
+
+        point.X = (double) x;
+        point.Y = (double) y;
+        point.type = "move";
+        DatabaseReference newPostRef = TblxPoints.push();
+        String id = newPostRef.getKey();
+        TBLPoints.put(id,point);
         TblxPoints.setValue(TBLPoints);
     }
 
     private void moveTouchLocal(float x, float y) {
-        float dx = Math.abs(x - mX);
-        float dy = Math.abs(y - mY);
-        if (dx >= TOLERANCE || dy >= TOLERANCE) {
-            mPath.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
-            mX = x;
-            mY = y;
-        }
+        System.out.println(x);
+        System.out.println(y);
+        mPath.lineTo(x,y);
     }
 
 
@@ -159,8 +215,11 @@ public class CanvasView extends View {
 
     // when ACTION_UP stop touch
     private void upTouch() {
-        //System.out.println("UP TOUCH");
-        mPath.lineTo(mX, mY);
+//        System.out.println("UP TOUCH");
+    }
+
+    private void upTouchLocal() {
+        System.out.println("UP TOUCH");
     }
 
     //override the onTouchEvent
