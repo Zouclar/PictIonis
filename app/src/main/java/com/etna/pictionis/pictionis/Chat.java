@@ -46,7 +46,7 @@ public class Chat extends AppCompatActivity implements View.OnClickListener {
 
         if (view == Rollback){
             finish();
-            startActivity(new Intent(this, MainActivity.class));
+            startActivity(new Intent(this, Game.class));
         }
     }
 }
