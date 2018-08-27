@@ -23,12 +23,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 
 public class CanvasView extends View {
 
     public int width;
     public  int height;
+    private Boolean isHost;
     private Bitmap  mBitmap;
     private Canvas  canvas;
     private Path    mPath;
@@ -88,7 +90,7 @@ public class CanvasView extends View {
     }
 
     private void touch_start(float x, float y) {
-        mPath.reset();
+        //mPath.reset();
         mPath.moveTo(x, y);
         mX = x;
         mY = y;
@@ -101,16 +103,17 @@ public class CanvasView extends View {
             mPath.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
             mX = x;
             mY = y;
+
+            circlePath.reset();
+            circlePath.addCircle(mX, mY, 30, Path.Direction.CW);
+            TblxPath.setValue(mPath);
         }
     }
 
     private void touch_up() {
         mPath.lineTo(mX, mY);
-        DatabaseReference newPostRef = TblxPath.push();
         TblxPath.setValue(mPath);
     }
-
-
 
     private void touchLocal(Path path) {
         canvas.drawPath(path, mPaint);
@@ -119,7 +122,6 @@ public class CanvasView extends View {
     public void clearRemoteCanvas() {
         TblxPath.removeValue();
         TBLPath.clear();
-
     }
 
     public void clearLocalCanvas(){
@@ -136,47 +138,57 @@ public class CanvasView extends View {
         float x = event.getX();
         float y = event.getY();
 
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                touch_start(x, y);
-                invalidate();
-                break;
-            case MotionEvent.ACTION_MOVE:
-                touch_move(x, y);
-                invalidate();
-                break;
-            case MotionEvent.ACTION_UP:
-                touch_up();
-                invalidate();
-                break;
+        if(isHost){
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    touch_start(x, y);
+                    invalidate();
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    touch_move(x, y);
+                    invalidate();
+                    break;
+                case MotionEvent.ACTION_UP:
+                    touch_up();
+                    invalidate();
+                    break;
+            }
         }
+
         return true;
     }
 
-    public void setPartyName(String partyName) {
-        this.partyName = partyName;
+    public void setPartyName(String partyName, Boolean isHost) {
+        this.isHost = isHost;
+        if(isHost){
+            Random rand = new Random();
+            this.partyName = partyName.replaceAll("\\s+","") + "-" + rand.nextInt(10000) + 1;
+            DBref = DBref.child(this.partyName);
+            TblxPath = DBref.child("path");
+            TblxPath.setValue(this.partyName);
+        }
+        else{
+            this.partyName = partyName;
+            DBref = DBref.child(this.partyName);
+            TblxPath = DBref;
+        }
 
-        System.out.println("---------------------fsdfsd--------------------------");
-        System.out.println(this.partyName);
-        System.out.println("------------------------sdffsd-----------------------");
-        this.TblxPath.child(this.partyName).push().setValue(1);
-
-        this.TblxPath =  this.TblxPath.child(this.partyName);
-
-        TblxPath.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot: dataSnapshot.getChildren()) {
-                    Path path = snapshot.getValue(Path.class);
-
-                    touchLocal(path);
+        if(!this.isHost){
+            TblxPath.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for (DataSnapshot snapshot: dataSnapshot.getChildren()) {
+                        Path path = snapshot.getValue(Path.class);
+                        touchLocal(path);
+                    }
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                System.out.println("Cancelled");
-            }
-        });
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    System.out.println("Cancelled");
+                }
+            });
+        }
+
     }
 }

@@ -25,16 +25,15 @@ public class Game extends AppCompatActivity implements View.OnClickListener {
     private Button buttonClear;
     private CanvasView customCanvas;
     private String partyname;
+    private Boolean isHost;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
         partyname = getIntent().getStringExtra("partyname");
+        isHost = getIntent().getBooleanExtra("isHost", false);
         firebaseAuth = FirebaseAuth.getInstance();
-        System.out.println("-----------------------------------------------");
-        System.out.println(partyname);
-        System.out.println("-----------------------------------------------");
         phraseWelcome = findViewById(R.id.phraseWelcome);
         disconnect = findViewById(R.id.disconnect);
 
@@ -55,7 +54,7 @@ public class Game extends AppCompatActivity implements View.OnClickListener {
         FirebaseUser user = firebaseAuth.getCurrentUser();
 
 
-        customCanvas.setPartyName(partyname);
+        customCanvas.setPartyName(partyname, isHost);
         phraseWelcome.setText("Bienvenue "+user.getEmail());
 
         disconnect.setOnClickListener(this);
