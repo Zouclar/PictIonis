@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ArrayList<String> partiesArray = new ArrayList<String>();
     private Button launchPartyButton;
     private EditText partyNameText;
+    ArrayAdapter<String> adapter;
 
 
     @Override
@@ -41,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         launchPartyButton = findViewById(R.id.launch);
         partyNameText   = findViewById(R.id.partyname);
         firebaseAuth =  FirebaseAuth.getInstance();
-
+        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, partiesArray);
         launchPartyButton.setOnClickListener(this);
 
         if (firebaseAuth.getCurrentUser() == null){
@@ -49,12 +50,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             startActivity(new Intent(getApplicationContext(), Login.class));
         }
 
-        DBref.addListenerForSingleValueEvent(new ValueEventListener() {
+        DBref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
                 for (DataSnapshot snapshot: dataSnapshot.getChildren()) {
                     partiesArray.add(snapshot.getKey());
+
+                    parties = findViewById(R.id.parties);
+                    parties.setAdapter(adapter);
+                    parties.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                            String partyName = (String) (parties.getItemAtPosition(i));
+                            Intent intent = new Intent(getApplicationContext(), Game.class);
+                            intent.putExtra("partyname", partyName);
+                            intent.putExtra("isHost", false);
+                            startActivity(intent);
+                        }
+                    });
                 }
+                partiesArray = new ArrayList<String>();
             }
 
             @Override
@@ -65,19 +81,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         DatabaseReference DBref = FirebaseDatabase.getInstance().getReference();
         DatabaseReference DBSTblx = DBref.child("Path");
-        parties = findViewById(R.id.parties);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, partiesArray);
-        parties.setAdapter(adapter);
-        parties.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                String partyName = (String) (parties.getItemAtPosition(i));
-                Intent intent = new Intent(getApplicationContext(), Game.class);
-                intent.putExtra("partyname", partyName);
-                intent.putExtra("isHost", false);
-                startActivity(intent);
-            }
-        });
+
     }
 
     @Override

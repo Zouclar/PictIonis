@@ -22,6 +22,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -33,11 +36,11 @@ public class CanvasView extends View {
     private Boolean isHost;
     private Bitmap  mBitmap;
     private Canvas  canvas;
-    private Path    mPath;
+    private CustomPath    mPath;
     private Paint   mPaint;
     Context context;
     private Paint circlePaint;
-    private Path circlePath;
+    private CustomPath circlePath;
     private float mX, mY;
     private static final float TOLERANCE = 5;
     private DatabaseReference DBref = FirebaseDatabase.getInstance().getReference();
@@ -50,7 +53,7 @@ public class CanvasView extends View {
         super(c, attrs);
         context = c;
 
-        mPath = new Path();
+        mPath = new CustomPath(new ArrayList<PathAction>());
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
         mPaint.setColor(Color.BLACK);
@@ -60,14 +63,12 @@ public class CanvasView extends View {
         DBref = FirebaseDatabase.getInstance().getReference();
 
         circlePaint = new Paint();
-        circlePath = new Path();
+        circlePath = new CustomPath(new ArrayList<PathAction>());
         circlePaint.setAntiAlias(true);
         circlePaint.setColor(Color.BLUE);
         circlePaint.setStyle(Paint.Style.STROKE);
         circlePaint.setStrokeJoin(Paint.Join.MITER);
         circlePaint.setStrokeWidth(4f);
-
-
     }
 
     // override onSizeChanged
@@ -106,13 +107,22 @@ public class CanvasView extends View {
 
             circlePath.reset();
             circlePath.addCircle(mX, mY, 30, Path.Direction.CW);
-            TblxPath.setValue(mPath);
+            if(isHost){
+                Gson gson = new Gson();
+                String path_json = gson.toJson(mPath.actions);
+                TblxPath.setValue(path_json);
+            }
         }
     }
 
     private void touch_up() {
         mPath.lineTo(mX, mY);
-        TblxPath.setValue(mPath);
+
+        if(isHost){
+            Gson gson = new Gson();
+            String path_json = gson.toJson(mPath.actions);
+            TblxPath.setValue(path_json);
+        }
     }
 
     private void touchLocal(Path path) {
@@ -126,6 +136,7 @@ public class CanvasView extends View {
 
     public void clearLocalCanvas(){
         mPath.reset();
+        mPath.actions = new ArrayList<PathAction>();
         circlePath.reset();
         canvas.drawColor(Color.WHITE);
         invalidate();
@@ -154,7 +165,6 @@ public class CanvasView extends View {
                     break;
             }
         }
-
         return true;
     }
 
@@ -174,12 +184,39 @@ public class CanvasView extends View {
         }
 
         if(!this.isHost){
-            TblxPath.addListenerForSingleValueEvent(new ValueEventListener() {
+            TblxPath.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     for (DataSnapshot snapshot: dataSnapshot.getChildren()) {
-                        Path path = snapshot.getValue(Path.class);
-                        touchLocal(path);
+                        Gson gson = new Gson();
+                        String jsonPathAction = snapshot.getValue().toString();
+                        ArrayList<PathAction> actions = new ArrayList<PathAction>();
+
+                        actions = gson.fromJson(jsonPathAction, new TypeToken<ArrayList<PathAction>>(){}.getType());
+
+
+                        if(!mPath.actions.isEmpty()){
+                            mPath.reset();
+                            mPath.actions = new ArrayList<PathAction>();
+                            circlePath.reset();
+                            canvas.drawColor(Color.WHITE);
+                            invalidate();
+                        }
+
+                        for(PathAction p : actions){
+                            if(p.getType().equals("MOVE_TO")) {
+                                touch_start(p.getX(), p.getY());
+                                invalidate();
+                            }
+                            else if(p.getType().equals("LINE_TO")){
+                                touch_up();
+                                invalidate();
+                            }
+                            else if(p.getType().equals("QUAD_TO")){
+                                touch_move(p.getX(), p.getY());
+                                invalidate();
+                            }
+                        }
                     }
                 }
 
@@ -189,6 +226,5 @@ public class CanvasView extends View {
                 }
             });
         }
-
     }
 }
