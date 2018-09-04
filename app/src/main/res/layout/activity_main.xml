@@ -51,7 +51,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="textPersonName"
-            android:text="My Party" />
+            android:text="test" />
 
         <Button
             android:id="@+id/launch"

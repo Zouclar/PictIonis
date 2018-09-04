@@ -171,8 +171,8 @@ public class CanvasView extends View {
     public void setPartyName(String partyName, Boolean isHost) {
         this.isHost = isHost;
         if(isHost){
-            Random rand = new Random();
-            this.partyName = partyName.replaceAll("\\s+","") + "-" + rand.nextInt(10000) + 1;
+//            Random rand = new Random();
+//            this.partyName = partyName.replaceAll("\\s+","") + "-" + rand.nextInt(10000) + 1;
             DBref = DBref.child(this.partyName);
             TblxPath = DBref.child("path");
             TblxPath.setValue(this.partyName);

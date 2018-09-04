@@ -21,6 +21,7 @@ import com.google.firebase.database.ValueEventListener;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Game extends AppCompatActivity implements View.OnClickListener {
 
@@ -41,8 +42,6 @@ public class Game extends AppCompatActivity implements View.OnClickListener {
     private DatabaseReference TblxPath;
 
     ArrayList<String> listText=new ArrayList<String>();
-    private String Partyname;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +74,10 @@ public class Game extends AppCompatActivity implements View.OnClickListener {
 
         FirebaseUser user = firebaseAuth.getCurrentUser();
 
+        if(isHost){
+            Random rand = new Random();
+            this.partyname = partyname.replaceAll("\\s+","") + "-" + rand.nextInt(10000) + 1;
+        }
 
         customCanvas.setPartyName(partyname, isHost);
         phraseWelcome.setText("Bienvenue "+user.getEmail());
@@ -100,14 +103,14 @@ public class Game extends AppCompatActivity implements View.OnClickListener {
 
         if (view == buttonSend){
             String text = textInputLayout.getText().toString();
-            System.out.println("Text : "+ text);
-            System.out.println("Refer : "+ this.partyname);
+            System.out.println("Text : "+ text); //Texte de l'imput : ok
+            System.out.println("Refer : "+ this.partyname); // Nom de la romm = ko
 
             // EN TRAVAUX !!!!
-//            DBref = DBref.child(this.partyname);
-//            TblxPath = DBref.child("chat");
-//            listText.add(text);
-//            TblxPath.setValue(listText);
+            DBref = DBref.child(this.partyname);
+            TblxPath = DBref.child("chat");
+            listText.add(text);
+            TblxPath.setValue(listText);
 
 
         }
