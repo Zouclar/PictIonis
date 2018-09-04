@@ -106,7 +106,7 @@ public class CanvasView extends View {
             mY = y;
 
             circlePath.reset();
-            circlePath.addCircle(mX, mY, 30, Path.Direction.CW);
+            //circlePath.addCircle(mX, mY, 30, Path.Direction.CW);
             if(isHost){
                 Gson gson = new Gson();
                 String path_json = gson.toJson(mPath.actions);

@@ -27,3 +27,4 @@ google-services.json
 
 .gradle/
 .idea/
+local.properties
