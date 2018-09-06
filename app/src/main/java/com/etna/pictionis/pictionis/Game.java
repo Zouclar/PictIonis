@@ -62,6 +62,7 @@ public class Game extends AppCompatActivity implements View.OnClickListener {
         buttonClear.setOnClickListener(this);
     }
 
+    //Clear all canevas
     public void clearCanvas(View v) {
         customCanvas.clearRemoteCanvas();
         customCanvas.clearLocalCanvas();
@@ -75,10 +76,6 @@ public class Game extends AppCompatActivity implements View.OnClickListener {
             startActivity(new Intent(getApplicationContext(), Login.class));
         }
 
-        if (view == buttonChat){
-            finish();
-            startActivity(new Intent(getApplicationContext(), Chat.class));
-        }
         if (view == buttonClear){
             customCanvas.clearRemoteCanvas();
             customCanvas.clearLocalCanvas();

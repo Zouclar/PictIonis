@@ -52,7 +52,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     }
 
 
-
+    //Get Login and password and log IT
     private void loginUser(){
         final String email = editEmail.getText().toString().trim();
         final String password = editPassword.getText().toString().trim();
@@ -92,7 +92,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
     }
 
-
+    //Check if password is valid
     public boolean isPasswordValid(String password) {
         if (password.length() > 5){
             return true;
@@ -103,6 +103,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         }
     }
 
+    //Check if email is valid
     public boolean isEmailValid(String email) {
         if (email.contains("@") && email.contains(".")){
             return true;

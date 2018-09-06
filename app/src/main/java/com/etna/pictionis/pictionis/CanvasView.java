@@ -90,13 +90,14 @@ public class CanvasView extends View {
         canvas.drawPath( circlePath,  circlePaint);
     }
 
+    //When touch screen
     private void touch_start(float x, float y) {
-        //mPath.reset();
         mPath.moveTo(x, y);
         mX = x;
         mY = y;
     }
 
+    //When move on screen
     private void touch_move(float x, float y) {
         float dx = Math.abs(x - mX);
         float dy = Math.abs(y - mY);
@@ -115,6 +116,7 @@ public class CanvasView extends View {
         }
     }
 
+    //When up of screen
     private void touch_up() {
         mPath.lineTo(mX, mY);
 
@@ -125,15 +127,13 @@ public class CanvasView extends View {
         }
     }
 
-    private void touchLocal(Path path) {
-        canvas.drawPath(path, mPaint);
-    }
-
+    //Clean Canvas of Firebase
     public void clearRemoteCanvas() {
         TblxPath.removeValue();
         TBLPath.clear();
     }
 
+    //Clean Canvas local
     public void clearLocalCanvas(){
         mPath.reset();
         mPath.actions = new ArrayList<PathAction>();
@@ -145,7 +145,6 @@ public class CanvasView extends View {
     //override the onTouchEvent
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        //System.out.println("ON TOUCH EVENT");
         float x = event.getX();
         float y = event.getY();
 
@@ -168,6 +167,7 @@ public class CanvasView extends View {
         return true;
     }
 
+    //Set name of party
     public void setPartyName(String partyName, Boolean isHost) {
         this.isHost = isHost;
         if(isHost){

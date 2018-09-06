@@ -54,6 +54,7 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
         }
     }
 
+    //Check email and password and register it
     private void registerUser(){
         final String email = editEmail.getText().toString().trim();
         final String password = editPassword.getText().toString().trim();
@@ -91,6 +92,7 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
         }
     }
 
+    //Check if password is valid
     public boolean isPasswordValid(String password) {
         if (password.length() > 5){
             return true;
@@ -101,6 +103,8 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
         }
     }
 
+
+    //Check if email is valid
     public boolean isEmailValid(String email) {
         if (email.contains("@") && email.contains(".")){
             return true;
