@@ -26,9 +26,6 @@
             android:screenOrientation="portrait"/>
         <activity android:name=".Game"
             android:screenOrientation="portrait"/>
-        <activity android:name=".Chat" android:screenOrientation="portrait">
-
-        </activity>
 
     </application>
 

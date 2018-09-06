@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (view == launchPartyButton){
             String partyName = partyNameText.getText().toString();
             Intent intent = new Intent(getApplicationContext(), Game.class);
-            intent.putExtra("partyname", partyName);
+            intent.putExtra("nameparty", partyName);
             intent.putExtra("isHost", true);
             startActivity(intent);
         }

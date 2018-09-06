@@ -31,7 +31,8 @@ public class Game extends AppCompatActivity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
-        partyname = getIntent().getStringExtra("partyname");
+        System.out.println(getIntent().getStringExtra("nameparty"));
+        partyname = getIntent().getStringExtra("nameparty");
         isHost = getIntent().getBooleanExtra("isHost", false);
         firebaseAuth = FirebaseAuth.getInstance();
         phraseWelcome = findViewById(R.id.phraseWelcome);
@@ -75,9 +76,18 @@ public class Game extends AppCompatActivity implements View.OnClickListener {
             startActivity(new Intent(getApplicationContext(), Login.class));
         }
 
-        if (view == buttonChat){
-            finish();
-            startActivity(new Intent(getApplicationContext(), Chat.class));
+
+        if (view == buttonSend){
+            String text = textInputLayout.getText().toString();
+            System.out.println("Text : "+ text); //Texte de l'imput : ok
+            System.out.println("Reference : "+ this.partyname); // Nom de la room = ko
+
+            // EN TRAVAUX !!!!
+            DBref = DBref.child(this.partyname);
+            TblxPath = DBref.child("chat");
+            listText.add(text);
+            TblxPath.setValue(listText);
+
         }
         if (view == buttonClear){
             customCanvas.clearRemoteCanvas();
